@@ -1,6 +1,6 @@
 const UrlShortenerApp = require('./src/app');
 const { logger } = require('./src/middleware/logger');
-const { Log } = require('./src/Logging-Middleware/logger'); // ✅ Remote logger
+const { Log } = require('./src/Logging-Middleware/logger'); 
 const UrlModel = require('./src/models/UrlModel');
 
 // Environment configuration
@@ -64,7 +64,7 @@ const gracefulShutdown = (signal) => {
     if (err) {
       logger.error('Error during server shutdown', { error: err.message });
       Log("backend", "fatal", "middleware", `Error during shutdown: ${err.message}`); // 
-      console.error('❌ Error during shutdown:', err.message);
+      console.error('Error during shutdown:', err.message);
       process.exit(1);
     }
 
@@ -77,7 +77,7 @@ const gracefulShutdown = (signal) => {
   setTimeout(() => {
     logger.error('Forced shutdown due to timeout');
     Log("backend", "fatal", "middleware", "Forced shutdown due to timeout"); // 
-    console.error('❌ Forced shutdown due to timeout');
+    console.error('Forced shutdown due to timeout');
     process.exit(1);
   }, 10000); // 10s timeout
 };
@@ -92,10 +92,10 @@ server.on('error', (error) => {
   Log("backend", "fatal", "middleware", `Server error: ${error.message}`); // 
 
   if (error.code === 'EADDRINUSE') {
-    console.error(`❌ Port ${PORT} is already in use. Please use a different port.`);
+    console.error(`Port ${PORT} is already in use. Please use a different port.`);
     process.exit(1);
   } else {
-    console.error('❌ Server error:', error.message);
+    console.error('Server error:', error.message);
   }
 });
 
