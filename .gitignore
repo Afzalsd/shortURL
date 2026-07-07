@@ -25,12 +25,3 @@ build/
 
 # Vite cache
 frontend/.vite/
-
-# Optional: coverage
-coverage/
-
-# VSCode settings (optional)
-.vscode/
-
-# Mac/Linux temp files
-*.swp
