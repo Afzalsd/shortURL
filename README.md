@@ -1,82 +1,61 @@
-# URL Shortener Microservice
+# relay — URL shortener
 
-A simple and fast URL shortening service built with Node.js. Convert long URLs into short, shareable links with analytics tracking.
+A full-stack URL shortener: paste a link, get a short code, and see click
+analytics (referrer, location, browser, device) as people use it.
 
-## Features
+## Stack
 
-- 🔗 Shorten any URL instantly
-- 📊 Track clicks and visitor analytics
-- ⏰ Set custom expiry times (1 min to 1 year)
-- 🎯 Create custom shortcodes or auto-generate them
-- 🌍 Geolocation tracking for visitors
-- 🔒 Input validation and security
+- **Backend:** Node.js, Express, MongoDB (Mongoose)
+- **Frontend:** React (Vite), Tailwind CSS, Recharts
 
-## Quick Start
+## Project structure
 
-1. **Install dependencies:**
-   ```bash
-   cd Backend_Test_Submission
-   npm install
-   ```
+```
+url-shortener/
+  backend/     Express API + redirect server
+  frontend/    React dashboard (Vite)
+```
 
-2. **Start the server:**
-   ```bash
-   node server.js
-   ```
+## Running locally
 
-3. **Server runs on:** `http://localhost:3000`
+### 1. MongoDB
 
-## API Usage
+You need a MongoDB instance — either local (`mongod`) or a free
+[MongoDB Atlas](https://www.mongodb.com/atlas) cluster.
 
-### Create Short URL
+### 2. Backend
+
 ```bash
-POST /shorturls
-{
-  "url": "https://www.google.com",
-  "validity": 60,              # minutes (optional, default: 30)
-  "shortcode": "google123"     # optional custom code
-}
+cd backend
+cp .env.example .env      # edit MONGODB_URI if needed
+npm install
+npm run dev                # http://localhost:3000
 ```
 
-Response:
-```json
-{
-  "shortLink": "http://localhost:3000/google123",
-  "expiry": "2025-08-23T12:30:00.000Z"
-}
-```
+### 3. Frontend
 
-### Get Statistics
 ```bash
-GET /shorturls/google123
+cd frontend
+npm install
+npm run dev                # http://localhost:5173
 ```
 
-### Use Short URL
-```bash
-GET /google123    # Redirects to original URL
-```
+The Vite dev server proxies `/api` to `http://localhost:3000`, so just open
+`http://localhost:5173`.
 
-## Testing
+## API
 
-Run the included test suite:
-```bash
-node testapi.js
-```
+| Method | Path                          | Description                                              |
+|--------|-------------------------------|------------------------------------------------------------|
+| POST   | `/api/urls`                   | Create a short URL (`url`, optional `shortcode`). Always expires 4 hours after creation. |
+| GET    | `/api/urls?limit=10`          | List the most recently created short URLs (default limit 10) |
+| GET    | `/api/urls/:shortcode/stats`  | Full click analytics for one shortcode                     |
+| GET    | `/:shortcode`                 | Redirect + record a click                                   |
 
-## Key Files
+## Behavior notes
 
-- `server.js` - Main server
-- `src/app.js` - Express setup
-- `src/routes/urlRoutes.js` - Create URLs & stats
-- `src/routes/redirectRoutes.js` - Handle redirects
-- `src/models/UrlModel.js` - Data storage
-- `testapi.js` - Test all endpoints
-
-## Rules
-
-- **Shortcodes**: 3-20 alphanumeric characters
-- **URL Validity**: 1 minute to 1 year
-- **Storage**: In-memory (resets on restart)
-- **Auto-cleanup**: Expired URLs removed hourly
-
-
+- Every link is active for a fixed **4 hours** (`LINK_LIFETIME_MINUTES` in `.env`), then requests to it 404 automatically — no cron job needed, the check happens at redirect/list time against `expiryDate`.
+- The homepage polls `GET /api/urls?limit=10` every 5 seconds to show a live "recently shortened worldwide" feed of the last 10 links created by anyone.
+- No authentication — all links are public and visible in that feed. A natural next step is user accounts (JWT) so people only see their own links in a private dashboard.
+- Storage is MongoDB (persistent), replacing the original in-memory `Map`.
+- Deploy: backend to Render/Railway/Fly, frontend to Vercel/Netlify, set `BASE_URL` (backend) and `CORS_ORIGIN` accordingly.
