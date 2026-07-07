@@ -1,0 +1,36 @@
+# Node modules
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Environment variables
+.env
+backend/.env
+frontend/.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build folders
+dist/
+build/
+
+# Vite cache
+frontend/.vite/
+
+# Optional: coverage
+coverage/
+
+# VSCode settings (optional)
+.vscode/
+
+# Mac/Linux temp files
+*.swp
